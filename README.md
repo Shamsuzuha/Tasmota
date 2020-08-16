@@ -102,7 +102,7 @@ Navigate to the MQTT integration in Home Assistant and you should see your dimme
 
 ## MultiPress Button Template
 
-If you want to use the `setoption73 1` multipress feature with the dimmer to have 6 actions per button you can use this template. This is more of an advanced user setup as you'll need to assign your various rules to all the button press states as needed.
+If you want to use the `setoption73 1` multipress feature with the dimmer to have 6 actions per button you can use this template. This is more of an advanced user setup as you'll need to assign your various rules to all the button press states as needed.  For more info check out [this video](https://youtu.be/jcdPRbWCGjE)
 
 ```
 {"NAME":"digiDIM Buttons","GPIO":[19,18,255,0,56,0,0,0,0,37,0,122,0],"FLAG":0,"BASE":72}
