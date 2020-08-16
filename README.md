@@ -80,8 +80,7 @@ so19 1
 
 Navigate to the MQTT integration in Home Assistant and you should see your dimmer now included.  It is that simple!
 
-
-## Sample Configuration YAML Code
+## Sample Manual Configuration YAML Code
 
 ```yaml
 - platform: mqtt
@@ -99,4 +98,12 @@ Navigate to the MQTT integration in Home Assistant and you should see your dimme
   payload_available: "Online"
   payload_not_available: "Offline"
   retain: false
+```
+
+## MultiPress Button Template
+
+If you want to use the `setoption73 1` multipress feature with the dimmer to have 6 actions per button you can use this template. This is more of an advanced user setup as you'll need to assign your various rules to all the button press states as needed.
+
+```
+{"NAME":"digiDIM Buttons","GPIO":[19,18,255,0,56,0,0,0,0,37,0,122,0],"FLAG":0,"BASE":72}
 ```
