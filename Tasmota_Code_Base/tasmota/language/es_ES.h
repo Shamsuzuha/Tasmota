@@ -28,7 +28,7 @@
  * Use online command StateText to translate ON, OFF, HOLD and TOGGLE.
  * Use online command Prefix to translate cmnd, stat and tele.
  *
- * Updated until v8.3.0.2
+ * Updated until v8.4.0.3
 \*********************************************************************/
 
 #define LANGUAGE_MODULE_NAME         // Enable to display "Module Generic" (ie Spanish), Disable to display "Generic Module" (ie English)
@@ -56,7 +56,7 @@
 #define D_AP "AP"                    // Access Point
 #define D_AS "como"
 #define D_AUTO "AUTO"
-#define D_BATT "Batt"                // Short for Battery
+#define D_BATT "Bat"                // Short for Battery
 #define D_BLINK "Blink"
 #define D_BLINKOFF "BlinkOff"
 #define D_BOOT_COUNT "Conteo Reinicios"
@@ -84,8 +84,10 @@
 #define D_DISABLED "Deshabilitado"
 #define D_DISTANCE "Distancia"
 #define D_DNS_SERVER "Servidor DNS"
+#define D_DO "Disolved Oxygen"
 #define D_DONE "Listo"
 #define D_DST_TIME "DST"
+#define D_EC "EC"
 #define D_ECO2 "eCO₂"
 #define D_EMULATION "Emulación"
 #define D_ENABLED "Habilitado"
@@ -124,12 +126,15 @@
 #define D_MULTI_PRESS "multi-press"
 #define D_NOISE "Ruido"
 #define D_NONE "Ninguno"
+#define D_O2 "Oxygen"
 #define D_OFF "Apagado"
 #define D_OFFLINE "Offline"
 #define D_OK "Ok"
 #define D_ON "Encendido"
 #define D_ONLINE "Online"
+#define D_ORP "ORP"
 #define D_PASSWORD "Clave"
+#define D_PH "pH"
 #define D_PORT "Puerto"
 #define D_POWER_FACTOR "Factor de Potencia"
 #define D_POWERUSAGE "Potencia"
@@ -187,6 +192,7 @@
 #define D_UV_POWER "UV Power"
 #define D_VERSION "Versión"
 #define D_VOLTAGE "Tensión"
+#define D_VOLUME "Volume"
 #define D_WEIGHT "Peso"
 #define D_WARMLIGHT "Cálida"
 #define D_WEB_SERVER "Servidor Web"
@@ -351,6 +357,7 @@
 #define D_UPLOAD_STARTED "Cargando archivo"
 #define D_UPGRADE_STARTED "Actualización iniciada"
 #define D_UPLOAD_DONE "Carga finalizada"
+#define D_UPLOAD_TRANSFER "Upload transfer"
 #define D_TRANSFER_STARTED "Transfer started"
 #define D_UPLOAD_ERR_1 "Ningún archivo seleccionado"
 #define D_UPLOAD_ERR_2 "Espacio insuficiente"
@@ -365,7 +372,7 @@
 #define D_UPLOAD_ERR_11 "No se pudo borrar en el chip RF"
 #define D_UPLOAD_ERR_12 "No se puedo escribir en el chip RF"
 #define D_UPLOAD_ERR_13 "No se pudo decodificar firmware RF"
-#define D_UPLOAD_ERR_14 "Not compatible"
+#define D_UPLOAD_ERR_14 "No compatible"
 #define D_UPLOAD_ERROR_CODE "Código de error de carga"
 
 #define D_ENTER_COMMAND "Ingresar comando"
@@ -501,12 +508,12 @@
 #define D_PROXIMITY "Proximidad"
 
 // xsns_32_mpu6050.ino
-#define D_AX_AXIS "Accel. X-Axis"
-#define D_AY_AXIS "Accel. Y-Axis"
-#define D_AZ_AXIS "Accel. Z-Axis"
-#define D_GX_AXIS "Gyro X-Axis"
-#define D_GY_AXIS "Gyro Y-Axis"
-#define D_GZ_AXIS "Gyro Z-Axis"
+#define D_AX_AXIS "Acel. Eje X"
+#define D_AY_AXIS "Acel. Eje Y"
+#define D_AZ_AXIS "Acel. Eje Z"
+#define D_GX_AXIS "Girós. Eje X"
+#define D_GY_AXIS "Girós. Eje Y"
+#define D_GZ_AXIS "Girós. Eje Z"
 
 // xsns_34_hx711.ino
 #define D_HX_CAL_REMOVE "Remover Peso"
@@ -599,6 +606,8 @@
 #define D_SENSOR_SDM120_RX     "SDMx20 Rx"
 #define D_SENSOR_SDM630_TX     "SDM630 Tx"
 #define D_SENSOR_SDM630_RX     "SDM630 Rx"
+#define D_SENSOR_WE517_TX      "WE517 Tx"
+#define D_SENSOR_WE517_RX      "WE517 Rx"
 #define D_SENSOR_TM1638_CLK    "TM16 CLK"
 #define D_SENSOR_TM1638_DIO    "TM16 DIO"
 #define D_SENSOR_TM1638_STB    "TM16 STB"
@@ -622,6 +631,7 @@
 #define D_SENSOR_MAX31855_CS   "MX31855 CS"
 #define D_SENSOR_MAX31855_CLK  "MX31855 CLK"
 #define D_SENSOR_MAX31855_DO   "MX31855 DO"
+#define D_SENSOR_MAX31865_CS   "MX31865 CS"
 #define D_SENSOR_NRG_SEL       "HLWBL SEL"  // Suffix "i"
 #define D_SENSOR_NRG_CF1       "HLWBL CF1"
 #define D_SENSOR_HLW_CF        "HLW8012 CF"
@@ -661,8 +671,8 @@
 #define D_SENSOR_A4988_STP     "A4988 STP"
 #define D_SENSOR_A4988_ENA     "A4988 ENA"
 #define D_SENSOR_A4988_MS1     "A4988 MS1"
-#define D_SENSOR_A4988_MS2     "A4988 MS2"
-#define D_SENSOR_A4988_MS3     "A4988 MS3"
+#define D_SENSOR_OUTPUT_HI     "Output Hi"
+#define D_SENSOR_OUTPUT_LO     "Output Lo"
 #define D_SENSOR_DDS2382_TX    "DDS238-2 Tx"
 #define D_SENSOR_DDS2382_RX    "DDS238-2 Rx"
 #define D_SENSOR_DDSU666_TX    "DDSU666 Tx"
@@ -671,9 +681,9 @@
 #define D_SENSOR_SM2135_DAT    "SM2135 Dat"
 #define D_SENSOR_DEEPSLEEP     "DeepSleep"
 #define D_SENSOR_EXS_ENABLE    "EXS Enable"
-#define D_SENSOR_CLIENT_TX      "Client TX"
-#define D_SENSOR_CLIENT_RX      "Client RX"
-#define D_SENSOR_CLIENT_RESET   "Client RST"
+#define D_SENSOR_CLIENT_TX     "Client TX"
+#define D_SENSOR_CLIENT_RX     "Client RX"
+#define D_SENSOR_CLIENT_RESET  "Client RST"
 #define D_SENSOR_GPS_RX        "GPS RX"
 #define D_SENSOR_GPS_TX        "GPS TX"
 #define D_SENSOR_HM10_RX       "HM10 RX"
@@ -684,6 +694,7 @@
 #define D_SENSOR_CC1101_GDO0   "CC1101 GDO0"
 #define D_SENSOR_CC1101_GDO2   "CC1101 GDO2"
 #define D_SENSOR_HRXL_RX       "HRXL Rx"
+#define D_SENSOR_DYP_RX        "DYP Rx"
 #define D_SENSOR_ELECTRIQ_MOODL "MOODL Tx"
 #define D_SENSOR_AS3935        "AS3935"
 #define D_SENSOR_WINDMETER_SPEED "WindMeter Spd"
@@ -716,6 +727,8 @@
 #define D_SENSOR_TCP_RXD       "TCP Rx"
 #define D_SENSOR_IEM3000_TX    "iEM3000 TX"
 #define D_SENSOR_IEM3000_RX    "iEM3000 RX"
+#define D_SENSOR_MIEL_HVAC_TX  "MiEl HVAC Tx"
+#define D_SENSOR_MIEL_HVAC_RX  "MiEl HVAC Rx"
 
 // Units
 #define D_UNIT_AMPERE "A"
@@ -734,14 +747,19 @@
 #define D_UNIT_KILOMETER_PER_HOUR "km/h"  // or "km/h"
 #define D_UNIT_KILOOHM "kΩ"
 #define D_UNIT_KILOWATTHOUR "kWh"
+#define D_UNIT_LITERS "L"
+#define D_UNIT_LITERS_PER_MIN "L/m"
 #define D_UNIT_LUX "lx"
 #define D_UNIT_MICROGRAM_PER_CUBIC_METER "µg/m³"
 #define D_UNIT_MICROMETER "µm"
 #define D_UNIT_MICROSECOND "µs"
+#define D_UNIT_MICROSIEMENS_PER_CM "µS/cm"
 #define D_UNIT_MILLIAMPERE "mA"
+#define D_UNIT_MILLILITERS "ml"
 #define D_UNIT_MILLIMETER "mm"
 #define D_UNIT_MILLIMETER_MERCURY "mmHg"
 #define D_UNIT_MILLISECOND "ms"
+#define D_UNIT_MILLIVOLT "mV"
 #define D_UNIT_MINUTE "Min"
 #define D_UNIT_PARTS_PER_BILLION "ppb"
 #define D_UNIT_PARTS_PER_DECILITER "ppd"
@@ -820,6 +838,8 @@
 #define D_AS3935_NOISE "Ruido detectado"
 #define D_AS3935_DISTDET "Perturbancia detectada"
 #define D_AS3935_INTNOEV "Interrupción sin evento!"
+#define D_AS3935_FLICKER "IRQ flicker!"
+#define D_AS3935_POWEROFF "Power Off"
 #define D_AS3935_NOMESS "Escuchando..."
 #define D_AS3935_ON "Encendido"
 #define D_AS3935_OFF "Apagado"
@@ -833,12 +853,12 @@
 #define D_SENSOR_BOILER_OT_TX   "OpenTherm TX"
 
 // xnrg_15_teleinfo Denky (Teleinfo)
-#define D_CONTRACT        "Contract"
-#define D_POWER_LOAD      "Power load"
-#define D_CURRENT_TARIFF  "Current Tariff"
-#define D_TARIFF          "Tariff"
+#define D_CONTRACT        "Contratado"
+#define D_POWER_LOAD      "Potencia"
+#define D_CURRENT_TARIFF  "Tarifa Actual"
+#define D_TARIFF          "Tarifa"
 #define D_OVERLOAD        "ADPS"
-#define D_MAX_POWER       "Max Power"
-#define D_MAX_CURRENT     "Max Current"
+#define D_MAX_POWER       "Potencia Máxima"
+#define D_MAX_CURRENT     "Corriente Máxima"
 
 #endif  // _LANGUAGE_ES_ES_H_

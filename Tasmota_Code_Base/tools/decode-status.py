@@ -155,11 +155,21 @@ a_setoption = [[
     "Enable zerocross dimmer on PWM DIMMER",
     "Remove ZbReceived form JSON message",
     "Add the source endpoint as suffix to attributes",
-    "","","","",
-    "","","","",
-    "","","",""
+    "Baud rate for Teleinfo communication (0 = 1200 or 1 = 9600)",
+    "TLS mode",
+    "Disable all MQTT retained messages",
+    "Enable White blend mode",
+    "Create a virtual White ColorTemp for RGBW lights",
+    "Select virtual White as (0) Warm or (1) Cold",
+    "Enable Teleinfo telemetry into Tasmota Energy MQTT (0) or Teleinfo only (1)",
+    "Force gen1 Alexa mode",
+    "Disable Zigbee auto-config when pairing new devices",
+    "Use frequency output for buzzer pin instead of on/off signal",
+    "Use friendly name in zigbee topic (use with SetOption89)",
+    "Set dimmer low on rotary dial after power off"
     ],[
-    "","","","",
+    "Detach Switches from Relays and enable MQTT action state for all the SwitchModes",
+    "","","",
     "","","","",
     "","","","",
     "","","","",
@@ -220,9 +230,18 @@ a_features = [[
     "USE_WINDMETER","USE_OPENTHERM","USE_THERMOSTAT","USE_VEML6075",
     "USE_VEML7700","USE_MCP9808","USE_BL0940","USE_TELEGRAM",
     "USE_HP303B","USE_TCP_BRIDGE","USE_TELEINFO","USE_LMT01",
-    "USE_PROMETHEUS","USE_IEM3000","","",
+    "USE_PROMETHEUS","USE_IEM3000","USE_DYP","USE_I2S_AUDIO",
+    "USE_MLX90640","USE_VL53L1X","USE_MIEL_HVAC","USE_WE517",
+    "USE_EZOPH","USE_TTGO_WATCH","USE_ETHERNET","USE_WEBCAM"
+    ],[
+    "USE_EZOORP","USE_EZORTD","USE_EZOHUM","USE_EZOEC",
+    "USE_EZOCO2","USE_EZOO2","USE_EZOPRS","USE_EZOFLO",
+    "USE_EZODO","USE_EZORGB","USE_EZOPMP","",
     "","","","",
-    "","","USE_ETHERNET","USE_WEBCAM"
+    "","","","",
+    "","","","",
+    "","","","",
+    "","","",""
     ]]
 
 usage = "usage: decode-status {-d | -f} arg"
@@ -250,7 +269,7 @@ else:
         obj = json.load(fp)
 
 def StartDecode():
-    print ("\n*** decode-status.py v20200721 by Theo Arends and Jacek Ziolkowski ***")
+    print ("\n*** decode-status.py v20201107 by Theo Arends and Jacek Ziolkowski ***")
 
 #    print("Decoding\n{}".format(obj))
 
@@ -300,7 +319,7 @@ def StartDecode():
     if "StatusMEM" in obj:
         if "Features" in obj["StatusMEM"]:
             features = []
-            for f in range(6):
+            for f in range(7):
                 feature = obj["StatusMEM"]["Features"][f]
                 i_feature = int(feature,16)
                 if f == 0:
