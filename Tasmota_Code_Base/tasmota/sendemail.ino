@@ -185,12 +185,13 @@ WiFiClient *g_client;
 SendEmail::SendEmail(const String& host, const int port, const String& user, const String& passwd, const int timeout, const int auth_used) :
     host(host), port(port), user(user), passwd(passwd), timeout(timeout), ssl(ssl), auth_used(auth_used), client(new BearSSL::WiFiClientSecure_light(1024,1024)) {
 }
-#else
+#endif  // ESP8266
+#ifdef ESP32
 WiFiClient *g_client;
 SendEmail::SendEmail(const String& host, const int port, const String& user, const String& passwd, const int timeout, const int auth_used) :
     host(host), port(port), user(user), passwd(passwd), timeout(timeout), ssl(ssl), auth_used(auth_used), client(new WiFiClientSecure()) {
 }
-#endif
+#endif  // ESP32
 
 String SendEmail::readClient() {
   delay(0);
@@ -331,11 +332,6 @@ String buffer;
     goto exit;
   }
 
-  buffer = F("MIME-Version: 1.0\r\n");
-  client->print(buffer);
-  buffer = F("Content-Type: Multipart/mixed; boundary=frontier\r\n");
-  client->print(buffer);
-
   buffer = F("From: ");
   buffer += from;
   client->println(buffer);
@@ -350,22 +346,27 @@ String buffer;
 #endif
   buffer = F("Subject: ");
   buffer += subject;
-  buffer += F("\r\n");
   client->println(buffer);
 #ifdef DEBUG_EMAIL_PORT
   AddLog_P(LOG_LEVEL_INFO, PSTR("%s"),buffer.c_str());
 #endif
 
-
 #ifdef USE_SCRIPT
   if (*msg=='*' && *(msg+1)==0) {
+    buffer = F("MIME-Version: 1.0\r\n");
+    client->print(buffer);
+    buffer = F("Content-Type: Multipart/mixed; boundary=frontier\r\n\r\n");
+    client->print(buffer);
+
     g_client=client;
     script_send_email_body(xsend_message_txt);
   } else {
+#endif
+    buffer = F("\r\n");
+    client->print(buffer);
     client->println(msg);
+#ifdef USE_SCRIPT
   }
-#else
-  client->println(msg);
 #endif
   client->println('.');
 #ifdef DEBUG_EMAIL_PORT
@@ -388,7 +389,7 @@ void xsend_message_txt(char *msg) {
 #ifdef DEBUG_EMAIL_PORT
   AddLog_P(LOG_LEVEL_INFO, PSTR("%s"),msg);
 #endif
-#if defined(USE_SCRIPT_FATFS) && defined(USE_SCRIPT)
+#if (defined(USE_SCRIPT_FATFS) && defined(USE_SCRIPT)) || defined(UFILESYSTEM)
   if (*msg=='@') {
     msg++;
     attach_File(msg);
@@ -414,9 +415,9 @@ void xsend_message_txt(char *msg) {
 #endif
 }
 
-#if defined(USE_SCRIPT_FATFS) && defined(USE_SCRIPT)
+#if (defined(USE_SCRIPT_FATFS) && defined(USE_SCRIPT)) || defined(UFILESYSTEM)
 #include <LittleFS.h>
-extern FS *fsp;
+extern FS *ufsp;
 
 void attach_File(char *path) {
   g_client->print(F("--frontier\r\n"));
@@ -424,7 +425,7 @@ void attach_File(char *path) {
   char buff[64];
   char *cp = path;
   while (*cp=='/') cp++;
-  File file = fsp->open(path, "r");
+  File file = ufsp->open(path, "r");
   if (file) {
     sprintf_P(buff,PSTR("Content-Disposition: attachment; filename=\"%s\"\r\n\r\n"), cp);
     g_client->write(buff);
@@ -716,6 +717,8 @@ uint16_t SendMail(char *buffer) {
   //Set the storage types to read the attach files (SD is default)
   //smtpData.setFileStorageType(MailClientStorageType::SPIFFS);
 
+
+/*
 #ifdef USE_SCRIPT_FATFS
 #if USE_SCRIPT_FATFS<0
   smtpData.setFileStorageType(MailClientStorageType::FFat);
@@ -723,6 +726,9 @@ uint16_t SendMail(char *buffer) {
   smtpData.setFileStorageType(MailClientStorageType::SD);
 #endif
 #endif
+*/
+
+smtpData.setFileStorageType(MailClientStorageType::Univ);
 
 
   //smtpData.setSendCallback(sendCallback);

@@ -4,7 +4,7 @@
   Created by Gerhard Mutz on 07.10.11.
   adapted for Tasmota
 
-  Copyright (C) 2020  Gerhard Mutz and Theo Arends
+  Copyright (C) 2021  Gerhard Mutz and Theo Arends
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -86,6 +86,7 @@ struct METER_DESC {
   char *txmem;
   uint8_t index;
   uint8_t max_index;
+  uint8_t sopt;
 };
 
 // this descriptor method is no longer supported
@@ -117,10 +118,8 @@ struct METER_DESC {
 #if METER==SML_NO_OP
 #undef METERS_USED
 #define METERS_USED 0
-struct METER_DESC const meter_desc[1]={
-  [0]={3,'o',0,SML_BAUDRATE,"OBIS",-1,1,0}};
-const uint8_t meter[]=
-"1,1-0:1.8.0*255(@1," D_TPWRIN ",kWh," DJ_TPWRIN ",4|";
+struct METER_DESC const meter_desc[]={};
+const uint8_t meter[]="";
 #endif
 
 
@@ -472,11 +471,12 @@ const uint8_t *meter_p;
 uint8_t meter_spos[MAX_METERS];
 
 // software serial pointers
+#ifdef ESP8266
+TasmotaSerial *meter_ss[MAX_METERS];
+#endif  // ESP8266
 #ifdef ESP32
 HardwareSerial *meter_ss[MAX_METERS];
-#else
-TasmotaSerial *meter_ss[MAX_METERS];
-#endif
+#endif  // ESP32
 
 // serial buffers, may be made larger depending on telegram lenght
 #ifndef SML_BSIZ
@@ -821,40 +821,41 @@ uint8_t sml_logindex;
 
 void Dump2log(void) {
 
-int16_t index=0,hcnt=0;
-uint32_t d_lastms;
-uint8_t dchars[16];
+  int16_t index=0,hcnt=0;
+  uint32_t d_lastms;
+  uint8_t dchars[16];
+  char log_data[128];
 
   //if (!SML_SAVAILABLE) return;
 
   if (dump2log&8) {
     // combo mode
     while (SML_SAVAILABLE) {
-      TasmotaGlobal.log_data[index]=':';
+      log_data[index]=':';
       index++;
-      TasmotaGlobal.log_data[index]=' ';
+      log_data[index]=' ';
       index++;
       d_lastms=millis();
       while ((millis()-d_lastms)<40) {
         if (SML_SAVAILABLE) {
           uint8_t c=SML_SREAD;
-          sprintf(&TasmotaGlobal.log_data[index],"%02x ",c);
+          sprintf(&log_data[index],"%02x ",c);
           dchars[hcnt]=c;
           index+=3;
           hcnt++;
           if (hcnt>15) {
             // line complete, build asci chars
-            TasmotaGlobal.log_data[index]='=';
+            log_data[index]='=';
             index++;
-            TasmotaGlobal.log_data[index]='>';
+            log_data[index]='>';
             index++;
-            TasmotaGlobal.log_data[index]=' ';
+            log_data[index]=' ';
             index++;
             for (uint8_t ccnt=0; ccnt<16; ccnt++) {
               if (isprint(dchars[ccnt])) {
-                TasmotaGlobal.log_data[index]=dchars[ccnt];
+                log_data[index]=dchars[ccnt];
               } else {
-                TasmotaGlobal.log_data[index]=' ';
+                log_data[index]=' ';
               }
               index++;
             }
@@ -863,8 +864,8 @@ uint8_t dchars[16];
         }
       }
       if (index>0) {
-        TasmotaGlobal.log_data[index]=0;
-        AddLog(LOG_LEVEL_INFO);
+        log_data[index]=0;
+        AddLogData(LOG_LEVEL_INFO, log_data);
         index=0;
         hcnt=0;
       }
@@ -875,24 +876,24 @@ uint8_t dchars[16];
       while (SML_SAVAILABLE) {
         char c=SML_SREAD&0x7f;
         if (c=='\n' || c=='\r') {
-          TasmotaGlobal.log_data[sml_logindex]=0;
-          AddLog(LOG_LEVEL_INFO);
+          log_data[sml_logindex]=0;
+          AddLogData(LOG_LEVEL_INFO, log_data);
           sml_logindex=2;
-          TasmotaGlobal.log_data[0]=':';
-          TasmotaGlobal.log_data[1]=' ';
+          log_data[0]=':';
+          log_data[1]=' ';
           break;
         }
-        TasmotaGlobal.log_data[sml_logindex]=c;
-        if (sml_logindex<sizeof(TasmotaGlobal.log_data)-2) {
+        log_data[sml_logindex]=c;
+        if (sml_logindex<sizeof(log_data)-2) {
           sml_logindex++;
         }
       }
     } else {
       //while (SML_SAVAILABLE) {
       index=0;
-      TasmotaGlobal.log_data[index]=':';
+      log_data[index]=':';
       index++;
-      TasmotaGlobal.log_data[index]=' ';
+      log_data[index]=' ';
       index++;
       d_lastms=millis();
       while ((millis()-d_lastms)<40) {
@@ -901,7 +902,7 @@ uint8_t dchars[16];
           if (meter_desc_p[(dump2log&7)-1].type=='e') {
             // ebus
             c=SML_SREAD;
-            sprintf(&TasmotaGlobal.log_data[index],"%02x ",c);
+            sprintf(&log_data[index],"%02x ",c);
             index+=3;
             if (c==EBUS_SYNC) break;
           } else {
@@ -916,14 +917,14 @@ uint8_t dchars[16];
               }
             }
             c=SML_SREAD;
-            sprintf(&TasmotaGlobal.log_data[index],"%02x ",c);
+            sprintf(&log_data[index],"%02x ",c);
             index+=3;
           }
         }
       }
       if (index>2) {
-        TasmotaGlobal.log_data[index]=0;
-        AddLog(LOG_LEVEL_INFO);
+        log_data[index]=0;
+        AddLogData(LOG_LEVEL_INFO, log_data);
       }
     }
   }
@@ -2014,7 +2015,14 @@ dddef_exit:
           if (*lp!=',') goto next_line;
           lp++;
           script_meter_desc[index].type=*lp;
-          lp+=2;
+          lp++;
+          if (*lp!=',') {
+            script_meter_desc[index].sopt=*lp&7;
+            lp++;
+          } else {
+            script_meter_desc[index].sopt=0;
+          }
+          lp++;
           script_meter_desc[index].flag=strtol(lp,&lp,10);
           if (*lp!=',') goto next_line;
           lp++;
@@ -2171,35 +2179,41 @@ init10:
           meter_ss[meters] = new TasmotaSerial(meter_desc_p[meters].srcpin,meter_desc_p[meters].trxpin,1,1,TMSBSIZ);
         }
 #else
+#ifdef ESP8266
+        meter_ss[meters] = new TasmotaSerial(meter_desc_p[meters].srcpin,meter_desc_p[meters].trxpin,1,0,TMSBSIZ);
+#endif  // ESP8266
 #ifdef ESP32
         meter_ss[meters] = new HardwareSerial(uart_index);
         if (uart_index==0) { ClaimSerial(); }
         uart_index--;
         if (uart_index<0) uart_index=0;
         meter_ss[meters]->setRxBufferSize(TMSBSIZ);
-#else
-        meter_ss[meters] = new TasmotaSerial(meter_desc_p[meters].srcpin,meter_desc_p[meters].trxpin,1,0,TMSBSIZ);
-#endif
+#endif  // ESP32
 #endif
 
-#ifdef ESP32
-        if (meter_desc_p[meters].type=='M') {
-          meter_ss[meters]->begin(meter_desc_p[meters].params, SERIAL_8E1,meter_desc_p[meters].srcpin,meter_desc_p[meters].trxpin);
-        } else {
-          meter_ss[meters]->begin(meter_desc_p[meters].params,SERIAL_8N1,meter_desc_p[meters].srcpin,meter_desc_p[meters].trxpin);
+        SerialConfig smode = SERIAL_8N1;
+        if (meter_desc_p[meters].sopt == 2) {
+          smode = SERIAL_8N2;
         }
-#else
+        if (meter_desc_p[meters].type=='M') {
+          smode = SERIAL_8E1;
+          if (meter_desc_p[meters].sopt == 2) {
+            smode = SERIAL_8E2;
+          }
+        }
+#ifdef ESP8266
         if (meter_ss[meters]->begin(meter_desc_p[meters].params)) {
           meter_ss[meters]->flush();
         }
         if (meter_ss[meters]->hardwareSerial()) {
-          if (meter_desc_p[meters].type=='M') {
-            Serial.begin(meter_desc_p[meters].params, SERIAL_8E1);
-          }
+          Serial.begin(meter_desc_p[meters].params, smode);
           ClaimSerial();
           //Serial.setRxBufferSize(512);
         }
-#endif
+#endif  // ESP8266
+#ifdef ESP32
+        meter_ss[meters]->begin(meter_desc_p[meters].params, smode, meter_desc_p[meters].srcpin, meter_desc_p[meters].trxpin);
+#endif  // ESP32
     }
   }
 
@@ -2211,7 +2225,16 @@ uint32_t SML_SetBaud(uint32_t meter, uint32_t br) {
   if (meter<1 || meter>meters_used) return 0;
   meter--;
   if (!meter_ss[meter]) return 0;
-
+#ifdef ESP8266
+  if (meter_ss[meter]->begin(br)) {
+    meter_ss[meter]->flush();
+  }
+  if (meter_ss[meter]->hardwareSerial()) {
+    if (meter_desc_p[meter].type=='M') {
+      Serial.begin(br, SERIAL_8E1);
+    }
+  }
+#endif  // ESP8266
 #ifdef ESP32
   meter_ss[meter]->flush();
   meter_ss[meter]->updateBaudRate(br);
@@ -2221,16 +2244,7 @@ uint32_t SML_SetBaud(uint32_t meter, uint32_t br) {
   } else {
     meter_ss[meter]->begin(br,SERIAL_8N1,meter_desc_p[meter].srcpin,meter_desc_p[meter].trxpin);
   }*/
-#else
-  if (meter_ss[meter]->begin(br)) {
-    meter_ss[meter]->flush();
-  }
-  if (meter_ss[meter]->hardwareSerial()) {
-    if (meter_desc_p[meter].type=='M') {
-      Serial.begin(br, SERIAL_8E1);
-    }
-  }
-#endif
+#endif  // ESP32
   return 1;
 }
 

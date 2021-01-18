@@ -1,7 +1,7 @@
 /*
   xlgt_03_sm16716.ino - sm16716 three channel led support for Tasmota
 
-  Copyright (C) 2020  Theo Arends
+  Copyright (C) 2021  Theo Arends
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #ifdef USE_SM16716
 /*********************************************************************************************\
  * SM16716 - Controlling RGB over a synchronous serial line
- * Copyright (C) 2020  Gabor Simon
+ * Copyright (C) 2021  Gabor Simon
  *
  * Source: https://community.home-assistant.io/t/cheap-uk-wifi-bulbs-with-tasmota-teardown-help-tywe3s/40508/27
 \*********************************************************************************************/
@@ -150,9 +150,10 @@ void Sm16716ModuleSelected(void)
       if (PinUsed(GPIO_PWM1, i)) {
 #ifdef ESP8266
         pinMode(Pin(GPIO_PWM1, i), OUTPUT);
-#else  // ESP32
+#endif  // ESP8266
+#ifdef ESP32
         analogAttach(Pin(GPIO_PWM1, i), i);
-#endif
+#endif  // ESP32
       }
     }
 */

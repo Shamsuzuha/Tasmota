@@ -1,7 +1,7 @@
 /*
   xlgt_01_ws2812.ino - led string support for Tasmota
 
-  Copyright (C) 2020  Theo Arends
+  Copyright (C) 2021  Theo Arends
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -47,7 +47,11 @@ void (* const Ws2812Command[])(void) PROGMEM = {
 
 #include <NeoPixelBus.h>
 
-#if (USE_WS2812_CTYPE == NEO_GRB)
+#if (USE_WS2812_HARDWARE == NEO_HW_P9813)
+  typedef P9813BgrFeature selectedNeoFeatureType;
+  #undef USE_WS2812_DMA
+  #undef USE_WS2812_INVERTED
+#elif (USE_WS2812_CTYPE == NEO_GRB)
   typedef NeoGrbFeature selectedNeoFeatureType;
 #elif (USE_WS2812_CTYPE == NEO_BRG)
   typedef NeoBrgFeature selectedNeoFeatureType;
@@ -105,7 +109,9 @@ void (* const Ws2812Command[])(void) PROGMEM = {
 
 #else  // No USE_WS2812_INVERTED
 
-#if (USE_WS2812_HARDWARE == NEO_HW_WS2812X)
+#if (USE_WS2812_HARDWARE == NEO_HW_P9813)
+  typedef P9813Method selectedNeoSpeedType;
+#elif (USE_WS2812_HARDWARE == NEO_HW_WS2812X)
   typedef NeoEsp8266BitBangWs2812xMethod selectedNeoSpeedType;
 #elif (USE_WS2812_HARDWARE == NEO_HW_SK6812)
   typedef NeoEsp8266BitBangSk6812Method selectedNeoSpeedType;
@@ -304,22 +310,15 @@ void Ws2812Gradient(uint32_t schemenr)
   WsColor oldColor, currentColor;
   Ws2812GradientColor(schemenr, &oldColor, range, gradRange, offset);
   currentColor = oldColor;
+  speed = speed ? speed : 1;    // should never happen, just avoid div0
   for (uint32_t i = 0; i < Settings.light_pixels; i++) {
     if (kWsRepeat[Settings.light_width] > 1) {
-      Ws2812GradientColor(schemenr, &currentColor, range, gradRange, i +offset);
+      Ws2812GradientColor(schemenr, &currentColor, range, gradRange, i + offset + 1);
     }
-    if (Settings.light_speed > 0) {
-      // Blend old and current color based on time for smooth movement.
-      c.R = map(Light.strip_timer_counter % speed, 0, speed, oldColor.red, currentColor.red);
-      c.G = map(Light.strip_timer_counter % speed, 0, speed, oldColor.green, currentColor.green);
-      c.B = map(Light.strip_timer_counter % speed, 0, speed, oldColor.blue, currentColor.blue);
-    }
-    else {
-      // No animation, just use the current color.
-      c.R = currentColor.red;
-      c.G = currentColor.green;
-      c.B = currentColor.blue;
-    }
+    // Blend old and current color based on time for smooth movement.
+    c.R = map(Light.strip_timer_counter % speed, 0, speed, oldColor.red, currentColor.red);
+    c.G = map(Light.strip_timer_counter % speed, 0, speed, oldColor.green, currentColor.green);
+    c.B = map(Light.strip_timer_counter % speed, 0, speed, oldColor.blue, currentColor.blue);
     strip->SetPixelColor(i, c);
     oldColor = currentColor;
   }
@@ -479,10 +478,14 @@ void Ws2812ShowScheme(void)
 
 void Ws2812ModuleSelected(void)
 {
+#if (USE_WS2812_HARDWARE == NEO_HW_P9813)
+  if (PinUsed(GPIO_P9813_CLK) && PinUsed(GPIO_P9813_DAT)) {  // RGB led
+    strip = new NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType>(WS2812_MAX_LEDS, Pin(GPIO_P9813_CLK), Pin(GPIO_P9813_DAT));
+#else
   if (PinUsed(GPIO_WS2812)) {  // RGB led
-
     // For DMA, the Pin is ignored as it uses GPIO3 due to DMA hardware use.
     strip = new NeoPixelBus<selectedNeoFeatureType, selectedNeoSpeedType>(WS2812_MAX_LEDS, Pin(GPIO_WS2812));
+#endif  // NEO_HW_P9813
     strip->Begin();
 
     Ws2812Clear();

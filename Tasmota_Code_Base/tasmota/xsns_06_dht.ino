@@ -1,7 +1,7 @@
 /*
   xsns_06_dht.ino - DHTxx, AM23xx and SI7021 temperature and humidity sensor support for Tasmota
 
-  Copyright (C) 2020  Theo Arends
+  Copyright (C) 2021  Theo Arends
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 #ifdef USE_DHT
 /*********************************************************************************************\
- * DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), SI7021 - Temperature and Humidy
+ * DHT11, AM2301 (DHT21, DHT22, AM2302, AM2321), SI7021 - Temperature and Humidity
  *
  * Reading temperature or humidity takes about 250 milliseconds!
  * Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -52,7 +52,7 @@ bool DhtWaitState(uint32_t sensor, uint32_t level)
   unsigned long timeout = micros() + 100;
   while (digitalRead(Dht[sensor].pin) != level) {
     if (TimeReachedUsec(timeout)) {
-      PrepLog_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_DHT D_TIMEOUT_WAITING_FOR " %s " D_PULSE),
+      AddLog_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_DHT D_TIMEOUT_WAITING_FOR " %s " D_PULSE),
         (level) ? D_START_SIGNAL_HIGH : D_START_SIGNAL_LOW);
       return false;
     }

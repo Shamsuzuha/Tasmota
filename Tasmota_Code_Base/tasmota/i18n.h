@@ -1,7 +1,7 @@
 /*
   i18n.h - internationalization for Tasmota
 
-  Copyright (C) 2020  Theo Arends
+  Copyright (C) 2021  Theo Arends
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@
 #define D_JSON_CHANNEL "Channel"
 #define D_JSON_CO2 "CarbonDioxide"
 #define D_JSON_COMMAND "Command"
+#define D_JSON_CONFIDENCE "Confidence"
 #define D_JSON_CONFIG_HOLDER "CfgHolder"
 #define D_JSON_CONNECT_FAILED "Connect failed"
 #define D_JSON_COREVERSION "Core"
@@ -344,7 +345,7 @@
 #define D_CMND_TOUCH_THRES "TouchThres"
 #define D_CMND_TOUCH_NUM "TouchNum"
 #define D_CMND_CPU_FREQUENCY "CpuFrequency"
-#endif //ESP32
+#endif  // ESP32
 
 // Commands xdrv_01_mqtt.ino
 #define D_CMND_MQTTLOG "MqttLog"
@@ -424,6 +425,8 @@
 #define D_CMND_DIMMER_RANGE "DimmerRange"
 #define D_CMND_DIMMER_STEP "DimmerStep"
 #define D_CMND_HSBCOLOR "HSBColor"
+#define D_CMND_VIRTUALCT "VirtualCT"
+#define D_CMND_CTRANGE "CTRange"
 #define D_CMND_LED "Led"
 #define D_CMND_LEDTABLE "LedTable"
 #define D_CMND_FADE "Fade"
@@ -515,11 +518,6 @@
 #define D_CMND_LATITUDE "Latitude"
 #define D_CMND_LONGITUDE "Longitude"
 
-// Commands xdrv_16_tuyadimmer.ino
-#define D_CMND_TUYA_MCU "TuyaMCU"
-#define D_CMND_TUYA_MCU_SEND_STATE "TuyaSend"
-#define D_JSON_TUYA_MCU_RECEIVED "TuyaReceived"
-
 // Commands xdrv_23_zigbee.ino
 #define D_PRFX_ZB "Zb"
 #define D_ZIGBEE_NOT_STARTED "Zigbee not started"
@@ -552,6 +550,7 @@
   #define D_JSON_ZIGBEE_MODELID "ModelId"
 #define D_CMND_ZIGBEE_PROBE "Probe"
 #define D_CMND_ZIGBEE_FORGET "Forget"
+#define D_CMND_ZIGBEE_INFO "Info"
 #define D_CMND_ZIGBEE_SAVE "Save"
   #define D_CMND_ZIGBEE_LINKQUALITY "LinkQuality"
   #define D_CMND_ZIGBEE_CLUSTER "Cluster"
@@ -568,12 +567,14 @@
 #define D_CMND_ZIGBEE_RESPONSE "Response"
   #define D_JSON_ZIGBEE_ZCL_SENT "ZbZCLSent"
 #define D_JSON_ZIGBEE_RECEIVED "ZbReceived"
+#define D_JSON_ZIGBEE_INFO "ZbInfo"
 #define D_CMND_ZIGBEE_BIND "Bind"
   #define D_JSON_ZIGBEE_BIND "ZbBind"
 #define D_CMND_ZIGBEE_UNBIND "Unbind"
   #define D_JSON_ZIGBEE_UNBIND "ZbUnbind"
 #define D_CMND_ZIGBEE_BIND_STATE "BindState"
   #define D_JSON_ZIGBEE_BIND_STATE "ZbBindState"
+#define D_CMND_ZIGBEE_LEAVE "Leave"
 #define D_CMND_ZIGBEE_MAP "Map"
   #define D_JSON_ZIGBEE_MAP "ZbMap"
 #define D_JSON_ZIGBEE_PARENT "ZbParent"
@@ -679,7 +680,7 @@
 #define D_LOG_KNX "KNX: "
 #define D_LOG_LOG "LOG: "          // Logging
 #define D_LOG_MODULE "MOD: "       // Module
-#define D_LOG_MDNS "DNS: "         // mDNS
+#define D_LOG_MDNS "mDN: "         // mDNS
 #define D_LOG_MQTT "MQT: "         // MQTT
 #define D_LOG_OTHER "OTH: "        // Other
 #define D_LOG_RESULT "RSL: "       // Result
@@ -797,9 +798,5 @@ const char HTTP_SNS_COLOR_GREEN[]   PROGMEM = "{s}%s "  D_COLOR_GREEN         "{
 const char HTTP_SNS_COLOR_BLUE[]    PROGMEM = "{s}%s "  D_COLOR_BLUE          "{m}%u "                            "{e}";
 const char HTTP_SNS_MILLILITERS[]   PROGMEM = "{s}%s "  D_VOLUME              "{m}%s " D_UNIT_MILLILITERS         "{e}";
 #endif  // USE_WEBSERVER
-
-const uint32_t MARKER_START = 0x5AA55AA5;
-const uint32_t MARKER_END = 0xA55AA55A;
-const uint32_t VERSION_MARKER[] PROGMEM = { MARKER_START, VERSION, MARKER_END };
 
 #endif  // _I18N_H_

@@ -1,7 +1,7 @@
 /*
   xdrv_10_rules.ino - rule support for Tasmota
 
-  Copyright (C) 2020  ESP Easy Group and Theo Arends
+  Copyright (C) 2021  ESP Easy Group and Theo Arends
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -171,6 +171,7 @@ struct RULES {
   uint16_t mems_event = 0;   // Bitmask supporting MAX_RULE_MEMS bits
   bool teleperiod = false;
   bool busy = false;
+  bool no_execute = false;   // Don't actually execute rule commands
 
   char event_data[100];
 } Rules;
@@ -708,6 +709,7 @@ bool RuleSetProcess(uint8_t rule_set, String &event_saved)
 #endif
 
     if (RulesRuleMatch(rule_set, event, event_trigger, stop_all_rules)) {
+      if (Rules.no_execute) return true;
       if (plen == plen2) { stop_all_rules = true; }       // If BREAK was used on a triggered rule, Stop execution of this rule set
       commands.trim();
       String ucommand = commands;
@@ -972,9 +974,8 @@ void RulesEvery100ms(void)
 
 void RulesEverySecond(void)
 {
+  char json_event[120];
   if (Settings.rule_enabled && !Rules.busy) {  // Any rule enabled
-    char json_event[120];
-
     if (RtcTime.valid) {
       if ((TasmotaGlobal.uptime > 60) && (RtcTime.minute != Rules.last_minute)) {  // Execute from one minute after restart every minute only once
         Rules.last_minute = RtcTime.minute;
@@ -982,10 +983,12 @@ void RulesEverySecond(void)
         RulesProcessEvent(json_event);
       }
     }
-    for (uint32_t i = 0; i < MAX_RULE_TIMERS; i++) {
-      if (Rules.timer[i] != 0L) {           // Timer active?
-        if (TimeReached(Rules.timer[i])) {  // Timer finished?
-          Rules.timer[i] = 0L;              // Turn off this timer
+  }
+  for (uint32_t i = 0; i < MAX_RULE_TIMERS; i++) {
+    if (Rules.timer[i] != 0L) {           // Timer active?
+      if (TimeReached(Rules.timer[i])) {  // Timer finished?
+        Rules.timer[i] = 0L;              // Turn off this timer
+        if (Settings.rule_enabled && !Rules.busy) {  // Any rule enabled
           snprintf_P(json_event, sizeof(json_event), PSTR("{\"Rules\":{\"Timer\":%d}}"), i +1);
           RulesProcessEvent(json_event);
         }
@@ -2121,21 +2124,30 @@ void CmndRule(void)
 
 void CmndRuleTimer(void)
 {
-  if ((XdrvMailbox.index > 0) && (XdrvMailbox.index <= MAX_RULE_TIMERS)) {
-    if (XdrvMailbox.data_len > 0) {
-#ifdef USE_EXPRESSION
-      float timer_set = evaluateExpression(XdrvMailbox.data, XdrvMailbox.data_len);
-      Rules.timer[XdrvMailbox.index -1] = (timer_set > 0) ? millis() + (1000 * timer_set) : 0;
-#else
-      Rules.timer[XdrvMailbox.index -1] = (XdrvMailbox.payload > 0) ? millis() + (1000 * XdrvMailbox.payload) : 0;
-#endif  // USE_EXPRESSION
-    }
-    ResponseClear();
-    for (uint32_t i = 0; i < MAX_RULE_TIMERS; i++) {
-      ResponseAppend_P(PSTR("%c\"T%d\":%d"), (i) ? ',' : '{', i +1, (Rules.timer[i]) ? (Rules.timer[i] - millis()) / 1000 : 0);
-    }
-    ResponseJsonEnd();
+  if (XdrvMailbox.index > MAX_RULE_TIMERS) { return; }
+
+  uint32_t i = XdrvMailbox.index;
+  uint32_t max_i = XdrvMailbox.index;
+  if (0 == i) {
+    i = 1;
+    max_i = MAX_RULE_TIMERS;
   }
+#ifdef USE_EXPRESSION
+  float timer_set = evaluateExpression(XdrvMailbox.data, XdrvMailbox.data_len);
+  timer_set = (timer_set > 0) ? millis() + (1000 * timer_set) : 0;
+#else
+  uint32_t timer_set = (XdrvMailbox.payload > 0) ? millis() + (1000 * XdrvMailbox.payload) : 0;
+#endif  // USE_EXPRESSION
+  if (XdrvMailbox.data_len > 0) {
+    for ( ; i <= max_i ; ++i ) {
+      Rules.timer[i -1] = timer_set;
+    }
+  }
+  ResponseClear();
+  for (i = 0; i < MAX_RULE_TIMERS; i++) {
+    ResponseAppend_P(PSTR("%c\"T%d\":%d"), (i) ? ',' : '{', i +1, (Rules.timer[i]) ? (Rules.timer[i] - millis()) / 1000 : 0);
+  }
+  ResponseJsonEnd();
 }
 
 void CmndEvent(void)

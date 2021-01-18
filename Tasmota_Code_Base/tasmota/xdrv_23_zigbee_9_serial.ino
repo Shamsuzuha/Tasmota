@@ -1,7 +1,7 @@
 /*
   xdrv_23_zigbee_9_serial.ino - zigbee: serial communication with MCU
 
-  Copyright (C) 2020  Theo Arends and Stephan Hadinger
+  Copyright (C) 2021  Theo Arends and Stephan Hadinger
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ void ZigbeeInputLoop(void) {
       if (Settings.flag3.tuya_serial_mqtt_publish) {
         MqttPublishPrefixTopicRulesProcess_P(TELE, PSTR(D_RSLT_SENSOR));
       } else {
-        AddLog_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data);
+        AddLogZ_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data);
       }
 			// now process the message
       ZigbeeProcessInput(znp_buffer);
@@ -267,7 +267,7 @@ void ZigbeeInputLoop(void) {
         }
 
         ToHex_P((unsigned char*)ezsp_buffer.getBuffer(), ezsp_buffer.len(), hex_char, sizeof(hex_char));
-        AddLog_P(LOG_LEVEL_DEBUG_MORE, PSTR(D_LOG_ZIGBEE "{\"" D_JSON_ZIGBEE_EZSP_RECEIVED "2\":\"%s\"}"), hex_char);
+        AddLogZ_P(LOG_LEVEL_DEBUG_MORE, PSTR(D_LOG_ZIGBEE "{\"" D_JSON_ZIGBEE_EZSP_RECEIVED "2\":\"%s\"}"), hex_char);
         // now process the message
         ZigbeeProcessInputRaw(ezsp_buffer);
       }
@@ -357,7 +357,7 @@ void ZigbeeZNPSend(const uint8_t *msg, size_t len) {
   }
 	// Now send a MQTT message to report the sent message
 	char hex_char[(len * 2) + 2];
-  AddLog_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE D_JSON_ZIGBEEZNPSENT " %s"),
+  AddLogZ_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE D_JSON_ZIGBEEZNPSENT " %s"),
                                		ToHex_P(msg, len, hex_char, sizeof(hex_char)));
 }
 
@@ -446,8 +446,6 @@ void ZigbeeEZSPSendRaw(const uint8_t *msg, size_t len, bool send_cancel) {
 		AddLog_P(LOG_LEVEL_DEBUG, PSTR(D_JSON_ZIGBEE_EZSP_SENT ": bad message len %d"), len);
 		return;
 	}
-	uint8_t data_len = len - 2;		// removing CMD1 and CMD2
-
   // turn send led on
   Z_LedStatusSet(true);
 
@@ -493,7 +491,7 @@ void ZigbeeEZSPSendRaw(const uint8_t *msg, size_t len, bool send_cancel) {
 
   // Now send a MQTT message to report the sent message
   char hex_char[(len * 2) + 2];
-  AddLog_P(LOG_LEVEL_DEBUG_MORE, PSTR(D_LOG_ZIGBEE D_JSON_ZIGBEE_EZSP_SENT_RAW " %s"),
+  AddLogZ_P(LOG_LEVEL_DEBUG_MORE, PSTR(D_LOG_ZIGBEE D_JSON_ZIGBEE_EZSP_SENT_RAW " %s"),
                                   ToHex_P(msg, len, hex_char, sizeof(hex_char)));
 }
 
@@ -502,7 +500,7 @@ void ZigbeeEZSPSendRaw(const uint8_t *msg, size_t len, bool send_cancel) {
 void ZigbeeEZSPSendCmd(const uint8_t *msg, size_t len) {
   char hex_char[len*2 + 2];
   ToHex_P(msg, len, hex_char, sizeof(hex_char));
-  AddLog_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE "ZbEZSPSend %s"), hex_char);
+  AddLogZ_P(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE "ZbEZSPSend %s"), hex_char);
 
   SBuffer cmd(len+3);   // prefix with seq number (1 byte) and frame control bytes (2 bytes)
 
@@ -554,14 +552,14 @@ void ZigbeeEZSPSendDATA(const uint8_t *msg, size_t len) {
 }
 
 // Receive a high-level EZSP command/response, starting with 16-bits frame ID
-int32_t ZigbeeProcessInputEZSP(class SBuffer &buf) {
+void ZigbeeProcessInputEZSP(class SBuffer &buf) {
   // verify errors in first 2 bytes.
   // TODO
   // uint8_t  sequence_num = buf.get8(0);
   uint16_t frame_control = buf.get16(1);
   bool truncated = frame_control & 0x02;
   bool overflow = frame_control & 0x01;
-  bool callbackPending = frame_control & 0x04;
+  // bool callbackPending = frame_control & 0x04;
   bool security_enabled = frame_control & 0x8000;
   if (truncated || overflow || security_enabled) {
     AddLog_P(LOG_LEVEL_INFO, PSTR("ZIG: specific frame_control 0x%04X"), frame_control);
@@ -609,7 +607,7 @@ int32_t ZigbeeProcessInputEZSP(class SBuffer &buf) {
         log_level = LOG_LEVEL_DEBUG;
         break;
     }
-    AddLog_P(log_level, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data);    // TODO move to LOG_LEVEL_DEBUG when stable
+    AddLogZ_P(log_level, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data);    // TODO move to LOG_LEVEL_DEBUG when stable
   }
 
   // Pass message to state machine
@@ -634,7 +632,7 @@ void EZSP_HandleAck(uint8_t new_ack) {
 }
 
 // Receive raw ASH frame (CRC was removed, data unstuffed) but still contains frame numbers
-int32_t ZigbeeProcessInputRaw(class SBuffer &buf) {
+void ZigbeeProcessInputRaw(class SBuffer &buf) {
   uint8_t control_byte = buf.get8(0);
   uint8_t ack_num = control_byte & 0x07;        // keep 3 LSB
   if (control_byte & 0x80) {  // non DATA frame
