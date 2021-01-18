@@ -1,4 +1,4 @@
-## Tasmota - digiDIM Kinda Sorta Maybe Something Something Not Really Temporary Fork @ 9.1.0.1
+## Tasmota - digiDIM Kinda Sorta Maybe Something Something Not Really Temporary Fork @ 9.2.0.3
 
 Precompiled bins supplied in the bins folder of this repo.
 
