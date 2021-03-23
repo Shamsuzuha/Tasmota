@@ -64,7 +64,7 @@ NOTE: In the future, when you are preparing to flash a stock build of Tasmota to
 
 BONUS: Want the Red LED on while the light is off? Run this rule:  
 ```
-Rule3 on power1#state=1 do ledpower 0 endon on power1#state=0 do ledpower 1 endon on power1#boot=1 do ledpower 0 endon on power1#boot=0 do ledpower 1  
+Rule3 on power1#state=1 do ledpower 0 endon on power1#state=0 do ledpower 1 endon on power1#boot=1 do ledpower 0 endon on power1#boot=0 do ledpower 1 endon
 ```
 ```
 Rule3 1
