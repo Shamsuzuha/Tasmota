@@ -1,10 +1,10 @@
-## Tasmota - digiDIM Kinda Sorta Maybe Something Something Not Really Temporary Fork @ 9.2.0.3
+## Tasmota - digiDIM Something Something Temporary Fork @ 9.5.0.3
 
 Precompiled bins supplied in the bins folder of this repo.
 
 NOTE: Once you upgrade to 8.x you will only be able to downgrade to an older version via serial flash.  
 
-If you receive a Buffer Miscompare error when flashing any bin files do not worry, the fix is easy.  All this means is you do not have enough free space on the flash.  You need to flash Tasmota-lite.bin first, then flash the bin for this fork.  You could also try the gzip versions if your base of Tasmota is recent enough to accept gzip'd files.
+If you receive a Buffer Miscompare/Not Enough Space error when flashing any bin files do not worry, the fix is easy.  All this means is you do not have enough free space on the flash.  You need to flash Tasmota-lite.bin first, then flash the bin for this fork.  You could also try the gzip versions if your base of Tasmota is recent enough to accept gzip'd files.
 
 ### Changes
 
@@ -70,15 +70,9 @@ Rule3 on power1#state=1 do ledpower 0 endon on power1#state=0 do ledpower 1 endo
 Rule3 1
 ```
 
-## Home Assistant Auto Discovery into MQTT
+## Home Assistant Tasmota Integration
 
-Verify you setup a Device Name and FriendlyName in Configure Other section Tasmota.  You can set them the same if you like, such as "Kitchen Light".  Go to the Tasmota console and issue the following command:
-
-```
-so19 1
-```
-
-Navigate to the MQTT integration in Home Assistant and you should see your dimmer now included.  It is that simple!
+Verify you setup a Device Name and FriendlyName in Configure Other section Tasmota.  You can set them the same if you like, such as "Kitchen Light".  Install and/or open the Tasmota Integration.  It is that simple!
 
 ## Sample Manual Configuration YAML Code
 
