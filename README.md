@@ -72,7 +72,7 @@ Rule3 1
 
 ## Home Assistant Tasmota Integration
 
-Verify you setup a Device Name and FriendlyName in Configure Other section Tasmota.  You can set them the same if you like, such as "Kitchen Light".  Install and/or open the Tasmota Integration.  It is that simple!
+Verify you set a Device Name and FriendlyName in the Configure Other section of Tasmota.  You can set them the same if you like, such as "Kitchen Light".  Install and/or open the Tasmota Integration in Home Assistant.  It is that simple!
 
 ## Sample Manual Configuration YAML Code
 
