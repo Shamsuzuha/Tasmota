@@ -1,5 +1,7 @@
 ## Tasmota - digiDIM Something Something Temporary Fork @ 9.5.0.3
 
+It is recommended to use the standard PWM Dimmer Module built into the stock tasmota.bin release unless you need some functionality contained in the fork below.  There are no templates needed on the stock setup or the fork below, it is currently handled by built in modules in Tasmota.  Additional information on the [PWM Dimmer Module](https://tasmota.github.io/docs/PWM-dimmer-switch/)
+
 Precompiled bins supplied in the bins folder of this repo.
 
 NOTE: Once you upgrade to 8.x you will only be able to downgrade to an older version via serial flash.  
